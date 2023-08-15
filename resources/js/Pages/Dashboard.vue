@@ -1,5 +1,6 @@
 <script setup>
 import MainLayout from '../Layouts/MainLayout.vue';
+import { Head } from '@inertiajs/vue3';
 </script>
 
 <script>
@@ -9,6 +10,7 @@ export default {
 </script>
 
 <template>
+    <Head title="Dashboard" />
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">

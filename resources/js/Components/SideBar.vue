@@ -39,13 +39,21 @@ const { hasRole } = usePermission();
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-                    <!-- Add icons to the links using the .nav-icon class
-               with font-awesome or any other icon font library -->
+
                     <li class="nav-item">
                         <Link href="/dashboard" class="nav-link" :class="{ 'active': $page.component === 'Dashboard' }">
                         <i class="nav-icon fas fa-tachometer-alt"></i>
                         <p>
                             Dashboard
+                        </p>
+                        </Link>
+                    </li>
+
+                    <li class="nav-item">
+                        <Link :href="route('messages.index')" class="nav-link" :class="{ 'active': $page.component === 'Messages/Index' }">
+                        <i class="nav-icon fas fa-message"></i>
+                        <p>
+                            Messages
                         </p>
                         </Link>
                     </li>

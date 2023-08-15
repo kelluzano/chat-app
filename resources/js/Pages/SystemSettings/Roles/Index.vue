@@ -40,6 +40,7 @@ export default {
                                 <TableRow>
                                     <TableHeader>ID</TableHeader>
                                     <TableHeader>Name</TableHeader>
+                                    <TableHeader>Roles</TableHeader>
                                     <TableHeader>Action</TableHeader>
                                 </TableRow>
                             </template>
@@ -48,6 +49,11 @@ export default {
                                 <TableRow v-for="role in roles" :key="role.id">
                                     <TableDataCell>{{ role.id }}</TableDataCell>
                                     <TableDataCell>{{ role.name }}</TableDataCell>
+                                    <TableDataCell>
+                                        <div class="d-flex">
+                                        <span v-for="permission in role.permissions" class="badge badge-info mr-2">{{ permission.name }}</span>
+                                        </div>
+                                    </TableDataCell>
                                     <TableDataCell>
                                         <div class="d-flex">
                                             <Link :href="route('roles.edit', role.id)"

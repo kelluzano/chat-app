@@ -1,7 +1,5 @@
 <script setup>
 const props = defineProps(['modalTitle'])
-
-defineEmits(['modalSave'])
 </script>
 
 <template>

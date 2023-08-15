@@ -12,7 +12,9 @@ class RoleController extends Controller
 {
     public function index()
     {
-        $roles = Role::get();
+        $roles = Role::query()->with(['permissions' => function ($query) {
+            $query->select('name');
+        }])->get();
         return inertia('SystemSettings/Roles/Index', compact('roles'));
     }
 
@@ -30,7 +32,7 @@ class RoleController extends Controller
 
         $role = Role::create($validated);
 
-        if($request->has('permissions')){
+        if ($request->has('permissions')) {
             $role->syncPermissions($request->input('permissions.*.name'));
         }
 
@@ -62,7 +64,8 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('message', 'Role has been updated.');
     }
 
-    public function destroy($id){
+    public function destroy($id)
+    {
         Role::where('id', $id)->delete();
         return redirect()->route('roles.index')->with('message', 'Role has been deleted.');;
     }

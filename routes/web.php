@@ -19,6 +19,13 @@ Route::group(['middleware' => ['auth']], function () {
         return Inertia::render('Dashboard');
     });
 
+    Route::get('/sessions', [\App\Http\Controllers\SessionController::class, 'list'])->name('sessions.list');
+
+    Route::group(['prefix' => 'messages'], function (){
+        Route::get('/', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
+       
+    });
+
     Route::group([
         'prefix' => 'system-settings',
         'middleware' => ['role:admin']

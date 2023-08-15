@@ -22,6 +22,7 @@ class PermissionController extends Controller
             'name' => ['required', 'min:3', 'unique:permissions,name']
         ]);
 
+        $validated['name'] = str_replace(' ', '-', strtolower($validated['name']));
         Permission::create($validated);
 
         return redirect()->route('permissions.index')->with('message', 'Permission added.');
@@ -38,6 +39,8 @@ class PermissionController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'min:3', 'unique:permissions,name']
         ]);
+
+        $validated['name'] = str_replace(' ', '-', strtolower($validated['name']));
 
         Permission::where('id', $id)->update($validated);
         return redirect()->route('permissions.index')->with('message', 'Permission has been updated.');

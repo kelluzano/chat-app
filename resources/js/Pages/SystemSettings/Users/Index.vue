@@ -27,11 +27,8 @@ function save() {
 
 function showModal(e) {
 
-    var id = $(e.currentTarget).attr('data-id');
-    var name = $(e.currentTarget).attr('data-name');
-
-    modalData.id = id;
-    modalData.name = name;
+    modalData.id = $(e.currentTarget).attr('data-id');
+    modalData.name = $(e.currentTarget).attr('data-name');
 
     modal.modal({ show: true })
 }
@@ -60,7 +57,7 @@ export default {
 
         <template #buttons>
             <button id="btnClose" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button class="btn btn-primary" @click="save()">Save changes</button>
+            <button class="btn btn-primary" @click="save()">Save</button>
         </template>
     </Modal>
     <div class="container-fluid">
