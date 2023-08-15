@@ -1,5 +1,5 @@
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Link, usePage } from "@inertiajs/vue3";
 import { onMounted } from "vue";
 import { usePermission } from "@/Composables/permission";
 
@@ -51,7 +51,7 @@ const { hasRole } = usePermission();
                     </li>
 
                     <li v-if="hasRole('admin')" class="nav-item">
-                        <a href="" class="nav-link" :class="{ 'active': $page.component === 'SystemSettings/Users' }">
+                        <a href="" class="nav-link" :class="{ 'active': usePage().url.indexOf('system-settings') != -1 }">
                             <i class="nav-icon far fa-plus-square"></i>
                             <p>
                                 System Settings
@@ -69,7 +69,7 @@ const { hasRole } = usePermission();
 
                             <li class="nav-item">
                                 <Link :href="route('roles.index')" class="nav-link"
-                                    :class="{ 'active': $page.component === 'SystemSettings/Roles' }">
+                                    :class="{ 'active': $page.component === 'SystemSettings/Roles/Index' }">
                                 <i class="far fa-solid fa-user-secret mr-2"></i>
                                 <p>Roles</p>
                                 </Link>
@@ -77,7 +77,7 @@ const { hasRole } = usePermission();
 
                             <li class="nav-item">
                                 <Link :href="route('permissions.index')" class="nav-link"
-                                    :class="{ 'active': $page.component === 'SystemSettings/Permissions' }">
+                                    :class="{ 'active': $page.component === 'SystemSettings/Permissions/Index' }">
                                 <i class="far fa-solid fa-user-shield mr-2"></i>
                                 <p>Permissions</p>
                                 </Link>
