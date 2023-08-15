@@ -29,8 +29,12 @@ const formattedCreatedAt = computed(() => {
         </div>
         <div class="d-flex flex-grow-1 flex-column mx-3">
             <span class="font-weight-bold text-md">{{ session.uniqueId }}</span>
-            <span class="text-sm"><small :title="formattedCreatedAt">{{ session.created_at_formatted
-            }}</small></span>
+            <span class="text-sm">
+                <small :title="formattedCreatedAt">
+                    {{ session.created_at_formatted }}
+                </small>
+            </span>
+
         </div>
         <div class="d-flex flex-column align-items-center">
             <span class="rounded-circle text-sm bg-success d-inline-block mb-1" style="width: 15px; height: 15px;"></span>

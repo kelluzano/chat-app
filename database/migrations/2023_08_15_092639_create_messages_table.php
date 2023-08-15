@@ -19,7 +19,7 @@ class CreateMessagesTable extends Migration
             $table->text('content')->nullable();
             $table->string('direction',5);
             $table->string('status', 10)->nullable();
-            $table->string('user_id',50);
+            $table->string('user_id',50)->nullable();
             $table->boolean('seen')->default(false);
             $table->timestamps();
             $table->softDeletes();

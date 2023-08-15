@@ -59,8 +59,6 @@ function handleCloseConversation(session) {
     if (index !== -1) {
         selectedSessions.value.splice(index, 1);
     }
-
-    console.log(selectedSessions.value);
 }
 
 </script>

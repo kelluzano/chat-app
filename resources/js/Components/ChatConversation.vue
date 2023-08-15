@@ -1,6 +1,7 @@
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
 const props = defineProps(['selectedSession']);
+
 </script>
 
 <template>
@@ -17,7 +18,8 @@ const props = defineProps(['selectedSession']);
                         data-widget="chat-pane-toggle">
                         <i class="fas fa-comments"></i>
                     </button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" @click="$emit('close-conversation', props.selectedSession);"><i class="fas fa-times"></i>
+                    <button type="button" class="btn btn-tool" data-card-widget="remove"
+                        @click="$emit('close-conversation', props.selectedSession);"><i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
@@ -26,41 +28,27 @@ const props = defineProps(['selectedSession']);
                 <!-- Conversations are loaded here -->
                 <div class="direct-chat-messages">
                     <!-- Message. Default to the left -->
-                    <div class="direct-chat-msg">
+                    <div v-if="selectedSession.messages" v-for="message in selectedSession.messages" :key="message.id"
+                        class="direct-chat-msg" :class="message.direction == 'out' ? 'right' : ''">
                         <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-left">Alexander Pierce</span>
-                            <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
+                            <span class="direct-chat-name"
+                                :class="message.direction == 'out' ? 'float-right' : 'float-left'">{{ message.user ? message.user.name : selectedSession.uniqueId }}</span>
+                            <span class="direct-chat-timestamp"
+                                :class="message.direction == 'out' ? 'float-left' : 'float-right'">23 Jan 2:00 pm</span>
                         </div>
                         <!-- /.direct-chat-infos -->
-                        <img class="direct-chat-img" src="/dist/img/avatar3.png" alt="message user image">
+                        <img class="direct-chat-img" :src="message.direction == 'out' ? '/dist/img/avatar3.png' : '/dist/img/avatar5.png'" alt="message user image">
                         <!-- /.direct-chat-img -->
                         <div class="direct-chat-text">
-                            Is this template really for free? That's unbelievable!
+                            {{ message.content }}
                         </div>
                         <!-- /.direct-chat-text -->
                     </div>
-                    <!-- /.direct-chat-msg -->
-                    <!-- Message to the right -->
-                    <div class="direct-chat-msg right">
-                        <div class="direct-chat-infos clearfix">
-                            <span class="direct-chat-name float-right">Sarah Bullock</span>
-                            <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-                        </div>
-                        <!-- /.direct-chat-infos -->
-                        <img class="direct-chat-img" src="/dist/img/avatar2.png" alt="message user image">
-                        <!-- /.direct-chat-img -->
-                        <div class="direct-chat-text">
-                            You better believe it!
-                        </div>
-                        <!-- /.direct-chat-text -->
-                    </div>
-                    <!-- /.direct-chat-msg -->
-                   
-                    <!-- /.direct-chat-msg -->
+                    <!-- /.direct-chat-msg -->  
+
                 </div>
                 <!--/.direct-chat-messages-->
-                
-               
+
                 <!-- /.direct-chat-pane -->
             </div>
             <!-- /.card-body -->
@@ -76,5 +64,4 @@ const props = defineProps(['selectedSession']);
             </div>
             <!-- /.card-footer-->
         </div>
-    </div>
-</template>
+</div></template>

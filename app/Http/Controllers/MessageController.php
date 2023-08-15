@@ -13,12 +13,13 @@ class MessageController extends Controller
 
         $keywords = $request->input('search');
         $query = Session::query()
+            ->with(['messages.user'])
             ->when($keywords, function ($query) use ($keywords) {
                 $query->where('uniqueId', 'like', "%{$keywords}%");
             });
 
         $sessions = $query->paginate(6);
-
+          
         if ($request->wantsJson()) {
             return response()->json($sessions);
         }
