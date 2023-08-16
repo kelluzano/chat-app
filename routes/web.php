@@ -23,7 +23,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::group(['prefix' => 'messages'], function (){
         Route::get('/', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
-       
+        Route::post('/send', [\App\Http\Controllers\MessageController::class, 'send'])->name('messages.send');
+        Route::get('/get/{uniqueId}', [\App\Http\Controllers\MessageController::class, 'getSelectedMessages'])->name('messages.get');
     });
 
     Route::group([

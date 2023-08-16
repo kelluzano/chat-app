@@ -50,6 +50,17 @@ onMounted(() => {
 
 function handleSessionSelected(session) {
     if (!selectedSessions.value.some(s => s.id === session.id)) {
+
+        $.ajax({
+            url: route('messages.get', session.uniqueId),
+            type: "GET",
+            dataType: "json",
+            success: function (response) {
+
+            }
+        });
+
+
         selectedSessions.value.push(session);
     }
 }
@@ -73,7 +84,7 @@ export default {
     <Head title="Messages" />
     <div class="container-fluid">
         <div class="row mt-2">
-            <div class="col-sm-6 col-md-3 d-flex flex-column">
+            <div class="col-sm-6 col-md-4 d-flex flex-column">
                 <div class="card card-outline card-primary">
                     <div class="card-body">
                         <div class="d-flex flex-column mt-1">
@@ -93,9 +104,9 @@ export default {
                 </div>
             </div>
 
-            <div class="col-sm-6 col-md-9">
+            <div class="col-sm-6 col-md-8">
                 <div class="row">
-                    <div v-for="selectedSession in selectedSessions" :key="selectedSession.id" class="col-md-4">
+                    <div v-for="selectedSession in selectedSessions" :key="selectedSession.id" class="col-md-6 col-lg-6">
                         <ChatConversation :selectedSession="selectedSession"
                             @close-conversation="handleCloseConversation" />
                     </div>

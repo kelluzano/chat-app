@@ -15,7 +15,7 @@ class CreateSessionsTable extends Migration
     {
         Schema::create('sessions', function (Blueprint $table) {
             $table->id();
-            $table->string('uniqueId')->unique();
+            $table->string('uniqueId',100);
             $table->string('channel_name', 20);
             $table->integer('assigned_to')->nullable();
             $table->timestamp('assigned_date')->nullable();
