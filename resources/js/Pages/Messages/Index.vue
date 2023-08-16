@@ -5,6 +5,7 @@ import ChatConversation from "@/Components/ChatConversation.vue";
 import ChatSideBar from "@/Components/ChatSideBar.vue";
 import { ref, onMounted, watch } from 'vue';
 import { debounce } from "lodash";
+import axios from "axios";
 
 const props = defineProps(['sessions'])
 const scrollContainer = ref(null);
@@ -19,18 +20,14 @@ const handleScroll = debounce(() => {
     if (scrollContainer.value.scrollHeight - scrollContainer.value.scrollTop <= scrollContainer.value.clientHeight + 10) {
         let nextPage = sessionData.value.next_page_url;
         if (nextPage) {
-            $.ajax({
-                url: nextPage,
-                type: "GET",
-                dataType: "json",
-                success: function (response) {
-                    sessionData.value = {
-                        ...response,
-                        data: [...sessionData.value.data, ...response.data],
-                    }
 
-                }
-            });
+            axios.get(nextPage)
+                .then(function (response) {
+                    sessionData.value = {
+                        ...response.data,
+                        data: [...sessionData.value.data, ...response.data.data],
+                    }
+                });
         }
     }
 }, 500);
@@ -49,19 +46,17 @@ onMounted(() => {
 
 
 function handleSessionSelected(session) {
+
     if (!selectedSessions.value.some(s => s.id === session.id)) {
 
-        $.ajax({
-            url: route('messages.get', session.uniqueId),
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-
-            }
-        });
-
-
-        selectedSessions.value.push(session);
+        axios.get(route('messages.get', session.uniqueId))
+            .then((response) => {
+                session.messages = response.data.data;
+                selectedSessions.value.push(session);
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
     }
 }
 

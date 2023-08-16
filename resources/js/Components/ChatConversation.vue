@@ -28,7 +28,6 @@ const send = debounce(function () {
         data: form,
         success: function (response) {
             messages.push(response);
-
             form.content = "";
         }
     });

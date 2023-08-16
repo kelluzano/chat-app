@@ -6,7 +6,7 @@ use Inertia\Inertia;
 use App\Models\Message;
 use App\Models\Session;
 use Illuminate\Http\Request;
-use Illuminate\Pagination\Paginator;
+
 
 class MessageController extends Controller
 {
@@ -15,15 +15,15 @@ class MessageController extends Controller
 
         $keywords = $request->input('search');
         $query = Session::query()
+            ->select('id', 'uniqueId', 'created_at')
             ->groupBy('uniqueId')
-            ->with(['messages.user'])
             ->when($keywords, function ($query) use ($keywords) {
                 $query->where('uniqueId', 'like', "%{$keywords}%");
             })
             ->orderby('created_at', 'desc');
 
         $sessions = $query->paginate(6);
-
+           
         if ($request->wantsJson()) {
             return response()->json($sessions);
         }
@@ -36,22 +36,15 @@ class MessageController extends Controller
     public function getSelectedMessages($uniqueId, Request $request)
     {
 
-        if ($request->wantsJson()) {
-            $uniqueId = "Ms. Matilda Lindgren"; // Your unique ID value
+        if ($request->wantsJson()) { 
+            // Retrive sessions ids
+            $sessions = Session::where('uniqueId', $uniqueId)->pluck('id');
+            $messages = Message::whereIn('session_id', $sessions)->with(['user' => function ($query){
+                $query->select('id', 'name');
+            }])
+            ->paginate(5);
 
-            // Retrieve the session with eager-loaded messages
-            $session = Session::with('messages')->where('uniqueId', $uniqueId)->first();
-
-            // Paginate the messages manually
-            $perPage = 10; // Number of messages per page
-            $page = request()->get('page', 1);
-
-            $messages = $session->messages->forPage($page, $perPage);
-
-            $paginator = new Paginator($messages, $perPage, $page);
-            dd($paginator);
-            // Render pagination links
-            $paginationLinks = $paginator->render();
+            return response()->json($messages);
         }
     }
 
