@@ -20,6 +20,11 @@ const formattedCreatedAt = computed(() => {
     return date.toLocaleString();
 });
 
+const clientName = computed(() => {
+    return props.session.client ? props.session.client.name : props.session.uniqueId ;
+});
+
+
 </script>
 <template>
     <div class="d-flex p-3 shadow border border-light rounded-lg mh-50" @click="$emit('session-selected', props.session);">
@@ -27,8 +32,8 @@ const formattedCreatedAt = computed(() => {
             <img :src="getRandomAvatar()" class="rounded-circle shadow shadow-sm" alt="User"
                 style="height: 50px; width: 50px;">
         </div>
-        <div class="d-flex flex-grow-1 flex-column mx-3">
-            <span class="font-weight-bold text-md">{{ session.uniqueId }}</span>
+        <div class="d-flex flex-grow-1 flex-column mx-3 w-50">
+            <span class="font-weight-bold text-md">{{ clientName }}</span>
             <span class="text-sm">
                 <small :title="formattedCreatedAt">
                     {{ session.created_at_formatted }}

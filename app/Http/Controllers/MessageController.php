@@ -17,9 +17,13 @@ class MessageController extends Controller
         $query = Session::query()
             ->select('id', 'uniqueId', 'created_at')
             ->groupBy('uniqueId')
-            ->when($keywords, function ($query) use ($keywords) {
-                $query->where('uniqueId', 'like', "%{$keywords}%");
+            ->where(function ($query) use ($keywords){
+                $query->orwhere('uniqueId', 'like', "%{$keywords}%")
+                        ->orwhereHas('client', function ($subquery) use ($keywords){
+                            $subquery->where('name','like', "%{$keywords}%");
+                        });
             })
+            ->with('client')
             ->orderby('created_at', 'desc');
 
         $sessions = $query->paginate(6)->withQueryString();

@@ -14,6 +14,11 @@ class Session extends Model
     
     protected $fillable = ['uniqueId', 'channel_name', 'assigned_to', 'assigned_date', 'dispostion', 'disposition_date', 'close_date'];
 
+
+    public function client(){
+        return $this->hasOne(ClientDetail::class, 'uniqueId', 'uniqueId');
+    }
+
     public function messages(){
         return $this->hasMany(Message::class, 'session_id');
     }

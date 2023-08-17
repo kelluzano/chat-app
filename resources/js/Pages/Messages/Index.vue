@@ -3,7 +3,7 @@ import { Head, useForm } from "@inertiajs/vue3";
 import MainLayout from "@/Layouts/MainLayout.vue";
 import ChatConversation from "@/Components/ChatConversation.vue";
 import ChatSideBar from "@/Components/ChatSideBar.vue";
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed } from 'vue';
 import { debounce } from "lodash";
 import axios from "axios";
 
@@ -48,8 +48,16 @@ onMounted(() => {
     });
 });
 
+const maxSessionAllowed = computed(() => {
+    return selectedSessions.value.length;
+})
 
 function handleSessionSelected(session) {
+    console.log(maxSessionAllowed);
+    if(maxSessionAllowed.value == 4){
+        alert('max');
+        return;
+    }
 
     if (!selectedSessions.value.some(s => s.id === session.id)) {
 

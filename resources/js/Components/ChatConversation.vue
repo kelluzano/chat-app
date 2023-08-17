@@ -1,6 +1,6 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
-import { reactive, ref, watch, onMounted, nextTick } from "vue";
+import { reactive, ref, watch, onMounted, nextTick, computed } from "vue";
 import { debounce } from "lodash";
 import axios from 'axios';
 
@@ -15,6 +15,10 @@ const form = reactive({
     content: '',
     direction: "out",
     user_id: parseInt(usePage().props.auth.user.id)
+});
+
+const clientName = computed(() => {
+    return props.selectedSession.client ? props.selectedSession.client.name : props.selectedSession.uniqueId;
 });
 
 const send = debounce(function () {
@@ -42,7 +46,7 @@ watch(() => form.content, () => {
 
 const currentPage = ref(props.selectedSession.messages.current_page);
 async function loadMoreMessages(){
-    
+
     if (!props.selectedSession.messages.next_page_url) {
         console.log('Reached the last page of messages.');
         return;
@@ -94,7 +98,7 @@ const failedMessage = (message) => {
     <div class="">
         <div class="card card-info direct-chat direct-chat-primary">
             <div class="card-header">
-                <h3 class="card-title">{{ selectedSession.uniqueId }}</h3>
+                <h3 class="card-title text-truncate w-50" :title="clientName">{{ clientName }}</h3>
                 <div class="card-tools">
                     <span data-toggle="tooltip" title="3 New Messages" class="badge badge-light">3</span>
                     <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -119,7 +123,7 @@ const failedMessage = (message) => {
                         <div class="direct-chat-infos clearfix">
                             <span class="direct-chat-name"
                                 :class="message.direction == 'out' ? 'float-right' : 'float-left'">{{ message.user ?
-                                    message.user.name : selectedSession.uniqueId }}</span>
+                                    message.user.name : clientName }}</span>
                             <span class="direct-chat-timestamp"
                                 :class="message.direction == 'out' ? 'float-left' : 'float-right'">{{
                                     message.created_at_formatted }}</span>
