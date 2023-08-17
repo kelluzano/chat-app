@@ -1,13 +1,14 @@
 <script setup>
 import { usePage } from '@inertiajs/vue3';
-import { reactive, ref, watch, onMounted, nextTick, computed } from "vue";
+import { reactive, ref, watch, onMounted, nextTick } from "vue";
 import { debounce } from "lodash";
+import axios from 'axios';
 
 const props = defineProps(['selectedSession']);
 
 const chatMessagesRef = ref(null);
 const sendBtn = ref(true);
-const messages = reactive(props.selectedSession.messages);
+const messages = reactive(props.selectedSession.messages.data);
 
 const form = reactive({
     session_id: parseInt(props.selectedSession.id),
@@ -18,19 +19,14 @@ const form = reactive({
 
 const send = debounce(function () {
 
-    $.ajax({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        url: route('messages.send'),
-        type: "POST",
-        dataType: "json",
-        data: form,
-        success: function (response) {
-            messages.push(response);
+    axios.post(route('messages.send'), form)
+        .then(function (response){
+            messages.push(response.data);
             form.content = "";
-        }
-    });
+        })
+        .catch(function (error){
+            console.log(error);
+        })
 
 }, 500)
 
@@ -43,6 +39,26 @@ watch(() => form.content, () => {
 
 });
 
+
+const currentPage = ref(props.selectedSession.messages.current_page);
+async function loadMoreMessages(){
+    
+    if (!props.selectedSession.messages.next_page_url) {
+        console.log('Reached the last page of messages.');
+        return;
+    }
+
+    if(currentPage.value <= props.selectedSession.messages.last_page){
+        await axios.get(props.selectedSession.messages.next_page_url)
+        .then(function (response){
+            messages.push(...response.data.data)
+            props.selectedSession.messages = response.data;
+            currentPage.value = response.data.current_page;
+        });
+    }
+
+}
+
 const scrollToBottom = () => {
     if (chatMessagesRef.value) {
         nextTick(() => {
@@ -53,10 +69,12 @@ const scrollToBottom = () => {
 
 onMounted(() => {
     scrollToBottom();
+    loadMoreMessages();
 });
 
 watch(messages, () => {
     scrollToBottom();
+    loadMoreMessages();
 });
 
 const failedMessage = (message) => {
@@ -68,6 +86,7 @@ const failedMessage = (message) => {
         };
     }
 };
+
 
 </script>
 

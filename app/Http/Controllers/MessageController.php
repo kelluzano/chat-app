@@ -22,8 +22,8 @@ class MessageController extends Controller
             })
             ->orderby('created_at', 'desc');
 
-        $sessions = $query->paginate(6);
-           
+        $sessions = $query->paginate(6)->withQueryString();
+    
         if ($request->wantsJson()) {
             return response()->json($sessions);
         }
@@ -36,14 +36,13 @@ class MessageController extends Controller
     public function getSelectedMessages($uniqueId, Request $request)
     {
 
-        if ($request->wantsJson()) { 
+        if ($request->wantsJson()) {
             // Retrive sessions ids
             $sessions = Session::where('uniqueId', $uniqueId)->pluck('id');
             $messages = Message::whereIn('session_id', $sessions)->with(['user' => function ($query){
                 $query->select('id', 'name');
             }])
             ->paginate(5);
-
             return response()->json($messages);
         }
     }

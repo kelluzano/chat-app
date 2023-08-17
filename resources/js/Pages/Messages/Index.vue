@@ -35,7 +35,11 @@ const handleScroll = debounce(() => {
 
 //Search method
 watch(() => form.search, debounce(() => {
-    console.log(form.search);
+    axios.get(route('messages.index'), { params: {search: form.search} })
+        .then(function (response) {
+            sessionData.value = response.data
+        });
+
 }, 500));
 
 onMounted(() => {
@@ -51,7 +55,7 @@ function handleSessionSelected(session) {
 
         axios.get(route('messages.get', session.uniqueId))
             .then((response) => {
-                session.messages = response.data.data;
+                session.messages = response.data;
                 selectedSessions.value.push(session);
             })
             .catch(function (error) {
