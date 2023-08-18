@@ -1,5 +1,5 @@
 <script setup>
-import { Head, useForm } from "@inertiajs/vue3";
+import { Head, useForm, router } from "@inertiajs/vue3";
 import MainLayout from "@/Layouts/MainLayout.vue";
 import ChatConversation from "@/Components/ChatConversation.vue";
 import ChatSideBar from "@/Components/ChatSideBar.vue";
@@ -32,7 +32,6 @@ const handleScroll = debounce(() => {
     }
 }, 500);
 
-
 //Search method
 watch(() => form.search, debounce(() => {
     axios.get(route('messages.index'), { params: {search: form.search} })
@@ -46,6 +45,7 @@ onMounted(() => {
     $("#scrollableBody").on("scroll", function () {
         handleScroll();
     });
+
 });
 
 const maxSessionAllowed = computed(() => {
@@ -79,6 +79,10 @@ function handleCloseConversation(session) {
     }
 }
 
+function handleSendRetry(message_id){
+    alert("You clicked failed message: " +message_id);
+}
+
 </script>
 
 <script>
@@ -101,7 +105,7 @@ export default {
                             <div id="scrollableBody" ref="scrollContainer" class="overflow-auto" style="height: 400px;">
 
                                 <div v-if="sessionData.data" v-for="session in sessionData.data" :key="session.id">
-                                    <ChatSideBar :session="session" @session-selected="handleSessionSelected" />
+                                    <ChatSideBar :session="session" @session-selected="handleSessionSelected"/>
                                 </div>
 
 
@@ -115,7 +119,8 @@ export default {
                 <div class="row">
                     <div v-for="selectedSession in selectedSessions" :key="selectedSession.id" class="col-md-6 col-lg-6">
                         <ChatConversation :selectedSession="selectedSession"
-                            @close-conversation="handleCloseConversation" />
+                            @close-conversation="handleCloseConversation"
+                            @send-retry="handleSendRetry"/>
                     </div>
                 </div>
             </div>

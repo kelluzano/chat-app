@@ -36,7 +36,7 @@ const clientName = computed(() => {
             <span class="font-weight-bold text-md">{{ clientName }}</span>
             <span class="text-sm">
                 <small :title="formattedCreatedAt">
-                    {{ session.created_at_formatted }}
+                    {{ session.last_message_received ? session.last_message_received?.last_message_formatted : "N/A"  }}
                 </small>
             </span>
 

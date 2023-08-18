@@ -9,9 +9,14 @@ use Illuminate\Http\Request;
 use Facade\FlareClient\Http\Client;
 use App\Http\Controllers\Controller;
 use App\Models\Message;
+use DB;
+use Illuminate\Support\Facades\Http;
 
 class ViberApiController extends Controller
 {
+
+    const send_endpoint = "https://chatapi.viber.com/pa/send_message";
+
     public function webhook(Request $request)
     {
         $json = file_get_contents("php://input");
@@ -22,9 +27,10 @@ class ViberApiController extends Controller
             case "message":
                 $this->received($input);
                 break;
+
         }
 
-        Log::info($input);
+        // Log::info($input);
     }
 
     public function save_client($clientData)
@@ -35,6 +41,8 @@ class ViberApiController extends Controller
         if ($data) return;
 
         ClientDetail::create($clientData);
+
+        return "success";
     }
 
     // public function save_session()
@@ -67,21 +75,24 @@ class ViberApiController extends Controller
         $hasActiveSession = Session::where('uniqueId', $clientId)
             ->whereNull('close_date')->latest()->first();
 
-        if(!$hasActiveSession){
+        if (!$hasActiveSession) {
 
-            $session = Session::create([
-                'uniqueId' => $clientId,
-                'channel_name' => 'viber',
-            ]);
+            DB::transaction(function () use ($clientId, $content, $clientData) {
+                $session = Session::create([
+                    'uniqueId' => $clientId,
+                    'channel_name' => 'viber',
+                ]);
 
-            $message = $session->messages()->create([
-                'content' => $content,
-                'direction' => 'in',
-            ]);
+                $message = $session->messages()->create([
+                    'content' => $content,
+                    'direction' => 'in',
+                ]);
 
-            $client = $this->save_client($clientData);
+                $client = $this->save_client($clientData);
 
-        }else{
+            });
+
+        } else {
 
             Message::create([
                 'session_id' => $hasActiveSession->id,
@@ -89,11 +100,28 @@ class ViberApiController extends Controller
                 'direction' => 'in',
             ]);
         }
+    }
 
-        //save client details
+    public function send($data){
 
+        $authToken = env("VIBER_API_TOKEN");
+        $receiver = $data['receiver'];
+        $text = $data['text'];
 
-        //check if has active session else saved
+        $data = [
+            'auth_token' => $authToken,
+            'receiver'   => $receiver,
+            'type'       => 'text',
+            'text'       => $text,
+        ];
 
+        $response = Http::post(self::send_endpoint, $data);
+
+        if ($response->successful()) {
+            return $response->json();
+        } else {
+            $errorMessage = $response->json()['error_message'];
+            return response()->json(['error' => $errorMessage], 500);
+        }
     }
 }

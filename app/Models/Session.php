@@ -11,7 +11,7 @@ class Session extends Model
     use HasFactory, SoftDeletes;
 
     protected $appends = ['created_at_formatted'];
-    
+
     protected $fillable = ['uniqueId', 'channel_name', 'assigned_to', 'assigned_date', 'dispostion', 'disposition_date', 'close_date'];
 
 
@@ -26,5 +26,9 @@ class Session extends Model
     public function getCreatedAtFormattedAttribute()
     {
         return $this->created_at->diffForHumans();
+    }
+
+    public function lastMessageReceived(){
+        return $this->hasOne(Message::class, 'session_id')->latest();
     }
 }

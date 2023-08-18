@@ -134,7 +134,8 @@ const failedMessage = (message) => {
                             alt="message user image">
                         <!-- /.direct-chat-img -->
                         <div class="direct-chat-text"
-                            :style="failedMessage(message)">
+                            :style="failedMessage(message)"
+                            @click="message.status == 'failed' ? $emit('send-retry', message.id) : ''">
                             {{ message.content }}
                         </div>
                         <!-- /.direct-chat-text -->
