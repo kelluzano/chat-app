@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Events\ReceiveMessageEvent;
 use Log;
 use App\Models\Session;
 use App\Models\ClientDetail;
@@ -75,9 +76,10 @@ class ViberApiController extends Controller
         $hasActiveSession = Session::where('uniqueId', $clientId)
             ->whereNull('close_date')->latest()->first();
 
+        $session = null;
         if (!$hasActiveSession) {
-
-            DB::transaction(function () use ($clientId, $content, $clientData) {
+            
+            DB::transaction(function () use ($clientId, $content, $clientData, &$session) {
                 $session = Session::create([
                     'uniqueId' => $clientId,
                     'channel_name' => 'viber',
@@ -92,14 +94,24 @@ class ViberApiController extends Controller
 
             });
 
-        } else {
+            $session_id = $session->id;
 
-            Message::create([
+        } else {
+            $session_id = $hasActiveSession->id;
+
+            $message = Message::create([
                 'session_id' => $hasActiveSession->id,
                 'content' => $content,
                 'direction' => 'in',
             ]);
         }
+
+        $session = Session::query()->with('lastMessageReceived', 'client', 'messageNotSeen')->find($session_id);
+        $data = [
+            'session' => $session,
+        ];
+
+        broadcast(new ReceiveMessageEvent($data));
     }
 
     public function send($data){

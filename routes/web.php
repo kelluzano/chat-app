@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\TestEvent;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
@@ -20,11 +21,15 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::get('/sessions', [\App\Http\Controllers\SessionController::class, 'list'])->name('sessions.list');
+    Route::post('/session/end', [\App\Http\Controllers\SessionController::class, 'end_session'])->name('session.end');
+
 
     Route::group(['prefix' => 'messages'], function (){
         Route::get('/', [\App\Http\Controllers\MessageController::class, 'index'])->name('messages.index');
         Route::post('/send', [\App\Http\Controllers\MessageController::class, 'send'])->name('messages.send');
         Route::get('/get/{uniqueId}', [\App\Http\Controllers\MessageController::class, 'getSelectedMessages'])->name('messages.get');
+        Route::post('/update/seen', [\App\Http\Controllers\MessageController::class, 'update_seen'])->name('messages.update.seen');
+
     });
 
     Route::group([

@@ -34,7 +34,7 @@ const handleScroll = debounce(() => {
 
 //Search method
 watch(() => form.search, debounce(() => {
-    axios.get(route('messages.index'), { params: {search: form.search} })
+    axios.get(route('messages.index'), { params: { search: form.search } })
         .then(function (response) {
             sessionData.value = response.data
         });
@@ -46,6 +46,22 @@ onMounted(() => {
         handleScroll();
     });
 
+    window.Echo.channel('new-message')
+        .listen('ReceiveMessageEvent', function (e) {
+
+            if (sessionData.value.data.some(session => session.id === e.data.session.id)) {
+                axios.get(route('messages.index'))
+                    .then(function (response) {
+                        sessionData.value = response.data
+
+                        if (selectedSessions.value.some(s => s.id === e.data.session.id)) {
+                            console.log("conversation open");
+                        }
+                    })
+            }
+
+        });
+
 });
 
 const maxSessionAllowed = computed(() => {
@@ -53,9 +69,8 @@ const maxSessionAllowed = computed(() => {
 })
 
 function handleSessionSelected(session) {
-    console.log(maxSessionAllowed);
-    if(maxSessionAllowed.value == 4){
-        alert('max');
+    if (maxSessionAllowed.value == 4) {
+        alert('max session open');
         return;
     }
 
@@ -79,8 +94,16 @@ function handleCloseConversation(session) {
     }
 }
 
-function handleSendRetry(message_id){
-    alert("You clicked failed message: " +message_id);
+function handleSendRetry(message_id) {
+    alert("Send failed messages: " + message_id);
+}
+
+function updateSessionData(updatedSession) {
+
+    const index = sessionData.value.data.findIndex(session => session.id === updatedSession.id);
+    if (index !== -1) {
+        sessionData.value.data[index] = updatedSession;
+    }
 }
 
 </script>
@@ -105,7 +128,7 @@ export default {
                             <div id="scrollableBody" ref="scrollContainer" class="overflow-auto" style="height: 400px;">
 
                                 <div v-if="sessionData.data" v-for="session in sessionData.data" :key="session.id">
-                                    <ChatSideBar :session="session" @session-selected="handleSessionSelected"/>
+                                    <ChatSideBar :session="session" @session-selected="handleSessionSelected" />
                                 </div>
 
 
@@ -118,9 +141,8 @@ export default {
             <div class="col-sm-6 col-md-8">
                 <div class="row">
                     <div v-for="selectedSession in selectedSessions" :key="selectedSession.id" class="col-md-6 col-lg-6">
-                        <ChatConversation :selectedSession="selectedSession"
-                            @close-conversation="handleCloseConversation"
-                            @send-retry="handleSendRetry"/>
+                        <ChatConversation :selectedSession="selectedSession" @close-conversation="handleCloseConversation"
+                            @send-retry="handleSendRetry" @updateSessionData="updateSessionData" />
                     </div>
                 </div>
             </div>

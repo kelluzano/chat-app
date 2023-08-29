@@ -22,6 +22,7 @@ class CreateSessionsTable extends Migration
             $table->string('disposition')->nullable();
             $table->timestamp('disposition_date')->nullable();
             $table->timestamp('close_date')->nullable();
+            $table->integer('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

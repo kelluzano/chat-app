@@ -16,15 +16,19 @@ class MessageController extends Controller
 
         $keywords = $request->input('search');
         $query = Session::query()
-            ->select('id', 'uniqueId', 'created_at')
-            ->groupBy('uniqueId')
-            ->where(function ($query) use ($keywords) {
-                $query->orwhere('uniqueId', 'like', "%{$keywords}%")
-                    ->orwhereHas('client', function ($subquery) use ($keywords) {
-                        $subquery->where('name', 'like', "%{$keywords}%");
-                    });
+            ->where('assigned_to', auth()->user()->id)
+            ->whereIn('id', function ($subquery) {
+                $subquery->selectRaw('MAX(id)')
+                ->from('sessions')
+                ->groupBy('uniqueId');
             })
-            ->with(['client', 'lastMessageReceived'])
+            ->where(function ($q) use ($keywords) {
+                $q->orwhere('uniqueId', 'like', "%{$keywords}%")
+                ->orwhereHas('client', function ($subquery) use ($keywords) {
+                    $subquery->where('name', 'like', "%{$keywords}%");
+                });
+            })
+            ->with(['client', 'lastMessageReceived', 'messageNotSeen'])
             ->orderby('created_at', 'desc');
 
         $sessions = $query->paginate(6)->withQueryString();
@@ -44,11 +48,14 @@ class MessageController extends Controller
         if ($request->wantsJson()) {
             // Retrive sessions ids
             $sessions = Session::where('uniqueId', $uniqueId)->pluck('id');
-            $messages = Message::whereIn('session_id', $sessions)->with(['user' => function ($query) {
+            $messages = Message::whereIn('session_id', $sessions)
+            ->with(['user' => function ($query) {
                 $query->select('id', 'name');
+            }, 'session' => function ($query){
+                $query->select('id', 'disposition', 'close_date', 'created_at');
             }])
             ->orderby('id')
-            ->paginate(5);
+            ->paginate(10);
             return response()->json($messages);
         }
     }
@@ -94,5 +101,15 @@ class MessageController extends Controller
         $response = $api->send($data);
 
         return $response;
+    }
+
+    public function update_seen(Request $request){
+       $message_ids = $request->ids;
+
+       $update = Message::whereIn('id', $message_ids)->update([
+            'seen' => 1,
+       ]);
+
+       return response()->json(['msg' => "success"]);
     }
 }

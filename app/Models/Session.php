@@ -12,7 +12,7 @@ class Session extends Model
 
     protected $appends = ['created_at_formatted'];
 
-    protected $fillable = ['uniqueId', 'channel_name', 'assigned_to', 'assigned_date', 'dispostion', 'disposition_date', 'close_date'];
+    protected $fillable = ['uniqueId', 'channel_name', 'assigned_to', 'assigned_date', 'dispostion', 'disposition_date', 'close_date', 'updated_by'];
 
 
     public function client(){
@@ -29,6 +29,10 @@ class Session extends Model
     }
 
     public function lastMessageReceived(){
-        return $this->hasOne(Message::class, 'session_id')->latest();
+        return $this->hasOne(Message::class, 'session_id')->where('direction', 'in')->latest();
+    }
+
+    public function messageNotSeen(){
+        return $this->hasMany(Message::class, 'session_id')->where('seen', 0)->where('direction', 'in');
     }
 }
